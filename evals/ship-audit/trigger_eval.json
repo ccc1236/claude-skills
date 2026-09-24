@@ -1,0 +1,22 @@
+[
+  {"query": "i'm about to open my vaultwarden instance to the internet through a cloudflare tunnel so my family can use it from their phones. what should i check before i flip it on?", "should_trigger": true},
+  {"query": "Built a little waitlist + dashboard app with Lovable, it's on Vercel with Supabase auth. ~200 people signed up already. Anything I should lock down before I post it on HN tomorrow?", "should_trigger": true},
+  {"query": "we have an internal flask tool for the ops team on a VM on the office LAN, plain http, sqlite db. my manager wants to know if it's 'secure enough'. can you check it over? repo is in ./ops-tool", "should_trigger": true},
+  {"query": "woke up to a $340 OpenAI bill from my side project (next.js on vercel, has a chat feature). how do i stop this happening again and what else might be exposed?", "should_trigger": true},
+  {"query": "Can you do a pre-launch security pass on this repo? Django app going to a Hetzner VPS behind nginx next week, Postgres in docker-compose.", "should_trigger": true},
+  {"query": "someone on discord told me my firebase database is 'wide open'. it's a react recipe sharing site. how do i check if that's true and what else could be wrong", "should_trigger": true},
+  {"query": "I've got forgejo, netbox and a few other services in docker on my homelab box, a couple exposed with tailscale funnel. Can you audit the setup and tell me what's actually reachable and risky?", "should_trigger": true},
+  {"query": "found a 40-item security checklist on reddit for vibe coded apps. can you go through my supabase + sveltekit app and tell me which items actually matter for it", "should_trigger": true},
+  {"query": "our telegram trading bot runs on a $5 droplet, api keys in a .env, deployed with git pull. it's been live 3 months. what would you fix first security-wise?", "should_trigger": true},
+  {"query": "Getting a flood of spam signups and I think someone is hammering the password reset endpoint. App is live on Render. What should I look at?", "should_trigger": true},
+  {"query": "review this PR diff for bugs before i merge - it refactors the pagination helper in src/utils/paginate.ts and touches 3 call sites", "should_trigger": false},
+  {"query": "write RLS policies for my supabase `todos` table so users can only see and edit their own rows. user_id is a uuid referencing auth.users", "should_trigger": false},
+  {"query": "add rate limiting middleware to my express app, 100 requests per 15 min per IP, using express-rate-limit", "should_trigger": false},
+  {"query": "certbot renew is failing on my nginx box with 'too many failed authorizations recently'. how do i fix it", "should_trigger": false},
+  {"query": "whats the actual difference between CSRF and XSS? studying for security+ and the book explains it badly", "should_trigger": false},
+  {"query": "is the npm package `left-pad-extra` safe to install? it has 12 weekly downloads and was published yesterday", "should_trigger": false},
+  {"query": "my docker container keeps restarting with exit code 137 on the homelab server, how do i debug it", "should_trigger": false},
+  {"query": "write a github actions workflow that runs vitest and eslint on every PR for my typescript repo", "should_trigger": false},
+  {"query": "this sql query in reports.py takes 40s on 2M rows, can you make it faster? it joins orders to customers and groups by month", "should_trigger": false},
+  {"query": "set up ufw on a fresh ubuntu 24.04 vps: allow ssh, 80 and 443, deny everything else", "should_trigger": false}
+]

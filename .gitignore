@@ -8,3 +8,7 @@ secrets.*
 Thumbs.db
 .vscode/
 .idea/
+
+# eval run outputs
+evals/*/runs/
+__pycache__/
