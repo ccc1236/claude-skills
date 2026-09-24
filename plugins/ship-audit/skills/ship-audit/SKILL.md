@@ -39,7 +39,8 @@ Only your own data · internal business records · personal data about third par
 payment or health data
 
 **What does a bad day look like?**
-Data disclosure · data loss · outage · a surprise bill · a legal letter
+Data disclosure · data loss · outage · a surprise bill · a legal letter · blocked by an upstream
+you don't control (an app store, a browser extension store, a third-party API revoking access)
 
 Then read the matching reference file(s) for checks specific to that shape:
 
@@ -47,6 +48,8 @@ Then read the matching reference file(s) for checks specific to that shape:
 - `references/managed-platform.md` - Supabase/Vercel/Firebase-style hosting
 - `references/public-exposure.md` - anyone on the internet can reach it, either way
 - `references/ai-features.md` - the app itself calls an LLM (chat, summarising, agents, tool use)
+- `references/client-side.md` - the code runs on the user's device: browser extensions, desktop
+  and mobile apps
 
 Read only what applies. Say plainly which categories you're skipping and why - "no CAPTCHA
 needed, there are no public forms" is a finding, not a gap. Noise is how audits become
@@ -81,6 +84,10 @@ Re-raising a settled decision every audit is how audits stop being read. If CSRF
 on a LAN deployment, acknowledge it in a line rather than presenting it as discovery. But if a
 decision was recorded and its stated justification is no longer true - the app got exposed, the
 data changed, users were added - that *is* worth raising.
+
+Check the ledger's facts as well as its decisions. An open item that is no longer true - a
+"no LICENSE" entry for a repo that now has one, a TODO for a fix that already shipped - should
+be flagged as stale so the ledger can be pruned. A ledger nobody trusts stops being read too.
 
 ## Step 3 - Audit the universal categories
 
@@ -240,6 +247,12 @@ before you start:
 read the status code. Plenty of things that look broken are handled somewhere you haven't read,
 and reporting those costs you trust for the findings that are real. Concrete commands for the
 common checks are in `references/verification.md`.
+
+When the runtime isn't yours to probe - a third-party site your extension runs on, a
+platform API with terms against testing - "only probe what the user controls" wins over
+"reproduce, don't infer". The bar then is a code-read finding plus a unit test that exercises
+the vulnerable path with the hostile input. Say in the report that it was verified that way
+rather than against the live system.
 
 **Check claims against the real environment.** If a finding depends on the shape of the data -
 "no user is affected", "this only matters at scale" - verify against actual production data, not

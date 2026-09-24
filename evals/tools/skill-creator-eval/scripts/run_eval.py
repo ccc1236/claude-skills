@@ -96,6 +96,7 @@ def run_single_query(
             "--output-format", "stream-json",
             "--verbose",
             "--include-partial-messages",
+            "--no-session-persistence",
         ]
         if model:
             cmd.extend(["--model", model])

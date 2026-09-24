@@ -20,3 +20,6 @@ plugin (Apache License 2.0, see `LICENSE.txt`). `run_eval.py` is modified:
    `taskkill /T`, and folder removal retries briefly.
 5. **UTF-8 command file.** The temporary skill file is written as UTF-8, so descriptions
    with non-ASCII characters don't crash on Windows' default encoding.
+6. **No saved transcripts.** Runs pass `--no-session-persistence`. Without it every run
+   saves a transcript under `~/.claude/projects/`, and because each run has its own
+   folder (change 2) that leaves one project folder behind per run.
