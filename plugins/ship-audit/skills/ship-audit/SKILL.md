@@ -55,6 +55,11 @@ Read only what applies. Say plainly which categories you're skipping and why - "
 needed, there are no public forms" is a finding, not a gap. Noise is how audits become
 wallpaper.
 
+The same goes for the Step 3 categories. Where the shape rules one out entirely - no file
+uploads, no login, no server of your own - list it now as not applicable, with the reason, and
+don't revisit it in Step 3. Only rule out what the shape settles; if you'd need to read the code
+to know, it stays in.
+
 Two failure modes to avoid here. Treating "internal" as "safe" ignores the curious colleague,
 the contractor on the guest VLAN, the compromised laptop and the honest admin mistake.
 Treating "managed platform" as "secure by default" ignores that the platform secures *itself*,
@@ -91,7 +96,8 @@ be flagged as stale so the ledger can be pruned. A ledger nobody trusts stops be
 
 ## Step 3 - Audit the universal categories
 
-These apply regardless of shape. Platform-specific checks live in the reference files.
+These apply to most shapes; work through the ones Step 0 didn't rule out. Platform-specific
+checks live in the reference files.
 
 ### Authorization
 
