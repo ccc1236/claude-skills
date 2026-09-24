@@ -37,6 +37,30 @@ real exposure, and source-code review will never surface it.
   from further than intended.
 - **Is the host reachable from further than the operator believes?** Verify from outside the
   expected network if you can.
+- **Containers publish around the firewall.** Docker's published ports (`ports:` in compose)
+  write their own iptables rules and are reachable even when UFW or firewalld says the port is
+  closed. Bind published ports to `127.0.0.1` when a reverse proxy fronts them, and check from
+  outside rather than trusting the firewall's status output.
+- **Tunnels and overlays.** Cloudflare Tunnel, Tailscale Funnel, ngrok and similar expose a
+  service publicly without opening a port, so they don't show up in a firewall review. List
+  what's currently tunnelled, and remove what was only meant to be temporary.
+- **Trusted proxy headers.** Behind a reverse proxy the app sees the proxy's address, so it
+  reads the client IP from `X-Forwarded-For`. If the app trusts that header from anyone, not
+  just the proxy, a client can set it themselves - defeating IP allowlists, per-IP rate limits
+  and audit logs in one move. Configure which proxies are trusted.
+
+## Default credentials and first-run
+
+Self-hosted apps ship with setup flows and defaults that are safe only until someone else finds
+them first.
+
+- **Default or example credentials** still active - admin passwords, admin tokens, database
+  passwords copied from a sample `.env` or compose file.
+- **First-run setup pages** left reachable after setup. An install wizard that lets whoever
+  arrives first create the admin account is a takeover on a public host.
+- **Admin panels exposed to the same audience as the app.** Many apps ship an admin interface
+  on a separate path or port that only needs to be reachable from the operator's machine.
+- **Open registration left on** after the operator's own accounts were created.
 
 ## Service isolation
 

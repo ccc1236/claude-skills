@@ -46,6 +46,7 @@ Then read the matching reference file(s) for checks specific to that shape:
 - `references/self-hosted.md` - you own the infrastructure
 - `references/managed-platform.md` - Supabase/Vercel/Firebase-style hosting
 - `references/public-exposure.md` - anyone on the internet can reach it, either way
+- `references/ai-features.md` - the app itself calls an LLM (chat, summarising, agents, tool use)
 
 Read only what applies. Say plainly which categories you're skipping and why - "no CAPTCHA
 needed, there are no public forms" is a finding, not a gap. Noise is how audits become
@@ -108,6 +109,45 @@ Usually the richest source of real bugs in a working app.
   as a number elsewhere, one bad value can wedge the system permanently. Self-inflicted denial
   of service is easy to miss and expensive to hit.
 
+### Injection and output
+
+Validation decides what gets in; this is about what the data does once it's in.
+
+- **Queries built from strings.** Any SQL, NoSQL filter or search query assembled by
+  concatenating user input instead of using parameters or the ORM's safe API. Check raw-query
+  escape hatches especially - every ORM has one, and it's where generated code reaches when the
+  safe API was awkward.
+- **Shell, eval and templates.** User input reaching a shell command, `eval`, or a server-side
+  template is executed as code, not handled as data.
+- **Output rendered as HTML.** Anything that writes user content without escaping -
+  `innerHTML`, `dangerouslySetInnerHTML`, `v-html`, `|safe`, markdown rendered without
+  sanitising - is stored XSS waiting for its first malicious user. Frameworks escape by default;
+  the bugs live where someone opted out.
+
+### File uploads
+
+- **Type and size limits enforced server-side**, by content rather than by file extension or
+  the client's declared type.
+- **How uploads are served.** User files served from the app's own origin with their original
+  content type let an uploaded SVG or HTML file run script as your site. Serve with a safe
+  content type and `Content-Disposition: attachment`, or from a separate domain.
+- **Filenames are user input.** A name like `../../config` written to disk unsanitised is path
+  traversal. Generate your own storage names.
+- **Can one user reach another's files?** Upload URLs are often guessable, public, or never
+  expire.
+
+### Outbound requests
+
+Features that fetch a URL the user supplies - link previews, "import from URL", webhook
+targets, avatar-by-URL - make your server a proxy into wherever it can reach.
+
+- **Can the URL point inward?** `localhost`, private address ranges and the cloud metadata
+  endpoint (`169.254.169.254`) are reachable from the server even when they aren't from the
+  internet. Metadata endpoints can hand out cloud credentials.
+- **Are redirects followed?** Validating the first URL is useless if the server then follows a
+  redirect somewhere internal.
+- **Is the response shown back to the user?** That turns a blind request into a read.
+
 ### Authentication and session
 
 - Test failure paths, not the happy path: absent fields, malformed input, repeated attempts.
@@ -143,6 +183,19 @@ Usually the richest source of real bugs in a working app.
 - Known vulnerabilities in what's actually installed, especially anything parsing untrusted
   input - document, image and archive parsers.
 
+### Build and deploy pipeline
+
+The pipeline usually holds more power than the app: deploy keys, cloud credentials, publish
+tokens.
+
+- **Can untrusted code reach secrets?** Workflows triggered by pull requests from forks
+  (`pull_request_target` on GitHub Actions is the classic) can run a stranger's code with your
+  secrets in the environment.
+- **Are third-party actions and build steps pinned** to a commit or version, or do they track a
+  branch someone else can move?
+- **How much can each credential do?** A deploy key or token scoped to everything turns one
+  leaked secret into a full compromise. Least privilege, per environment.
+
 ## AI-assisted and vibe-coded projects
 
 These have characteristic failure modes worth checking directly, because the code reads well
@@ -166,6 +219,22 @@ what's *behind* the UI rather than in it.
 ## Step 4 - Prove every finding before reporting it
 
 The credibility of the whole audit rests here.
+
+**Test safely.** Proving a finding means touching a real system, so decide where and how
+before you start:
+
+- **Ask before active testing against production.** Prefer a staging copy. If production is
+  the only option, say exactly what you intend to send and get a yes first.
+- **Never run destructive probes.** Don't exercise a delete path, an import or a migration
+  against real data to see what happens. Reason from the code, or reproduce on a copy.
+- **Mind side effects.** Lockout and rate-limit tests can lock out real users; abuse tests
+  against metered endpoints produce a real bill; signup and reset tests send real email. Use a
+  test account, stop at the first confirmation, and keep volume minimal.
+- **Only probe what the user controls.** Scans and fuzzers against someone else's host - a
+  shared platform, a third-party API, a neighbouring tenant - can breach their terms or the
+  law. Managed platforms often publish a testing policy; check it.
+- **If you can't verify safely, say so.** Report the finding as unverified, with the reason.
+  That's more useful than a guess presented as a result.
 
 **Reproduce, don't infer.** If you believe a route crashes on bad input, send the bad input and
 read the status code. Plenty of things that look broken are handled somewhere you haven't read,
@@ -220,6 +289,7 @@ Don't fix during the audit. Report first, let the user choose, then work through
 
 - Running a checklist written for a different deployment shape
 - Reporting inspection as if it were verification
+- Active testing against production without permission, or with side effects nobody agreed to
 - Confirming data-shape claims against an empty or non-production database
 - Re-raising decisions the project already settled
 - Treating "it's internal" or "it's managed" as the end of the analysis
