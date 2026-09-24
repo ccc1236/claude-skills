@@ -1,6 +1,6 @@
 ---
 name: ship-audit
-description: Security and robustness audit for an app before or after you ship it - covers self-hosted internal tools, VPS and homelab services, and public-facing apps built on managed platforms like Supabase, Vercel, Firebase or Netlify. Use this whenever the user asks if their app is safe to launch or expose, wants a security review or pre-launch check of something they built, mentions hardening or locking down an app, asks "what should I fix before real users get on this", is working through a security checklist they found online, worries about leaked API keys, an unexpected cloud bill, spam signups or an open database, or is auditing infrastructure like TLS, certificates, dependencies or backups. Applies to AI-assisted and vibe-coded projects, side projects, and internal business tools alike. Prefer this over a generic code review whenever the subject is a deployed or about-to-be-deployed application, because the findings that matter most for those live outside the source code.
+description: "Security and robustness audit of an app you're about to ship or already have: self-hosted and homelab services, or apps on Supabase, Vercel, Firebase and similar. Use when the user asks if their app is safe to launch or expose, wants a pre-launch security check, is working through a security checklist, or worries about leaked keys, a surprise cloud bill, spam signups or an open database. Prefer over a generic code review when the subject is a deployed or about-to-deploy app."
 ---
 
 # Auditing an app you're about to ship (or already did)
