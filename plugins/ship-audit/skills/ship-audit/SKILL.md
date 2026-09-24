@@ -238,7 +238,8 @@ before you start:
 
 **Reproduce, don't infer.** If you believe a route crashes on bad input, send the bad input and
 read the status code. Plenty of things that look broken are handled somewhere you haven't read,
-and reporting those costs you trust for the findings that are real.
+and reporting those costs you trust for the findings that are real. Concrete commands for the
+common checks are in `references/verification.md`.
 
 **Check claims against the real environment.** If a finding depends on the shape of the data -
 "no user is affected", "this only matters at scale" - verify against actual production data, not
