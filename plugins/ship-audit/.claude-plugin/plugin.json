@@ -1,0 +1,11 @@
+{
+  "name": "ship-audit",
+  "version": "1.0.0",
+  "description": "Security and robustness audit for an app before or after you ship it: self-hosted tools, VPS/homelab services, and apps on managed platforms like Supabase, Vercel, Firebase or Netlify.",
+  "author": {
+    "name": "ccc1236",
+    "url": "https://github.com/ccc1236"
+  },
+  "repository": "https://github.com/ccc1236/claude-skills",
+  "license": "MIT"
+}
