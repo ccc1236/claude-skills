@@ -12,6 +12,9 @@ evals/run_trigger_eval.sh ship-audit 2          # cheaper
 evals/run_trigger_eval.sh ship-audit 3 new.txt  # test a candidate description
 ```
 
+Runs 3 sessions in parallel by default; set `EVAL_WORKERS=1` to go serial or raise it to go
+faster. Parallel runs use the same total quota, just sooner.
+
 Needs the `claude` CLI logged in (`claude`, then `/login`) and Python 3.10+. Each run is a
 full `claude -p` session on your plan: 20 prompts x 3 runs is 60 sessions, so watch your
 usage limit. Results go to `evals/<skill>/runs/` (git-ignored). The runner uses a patched

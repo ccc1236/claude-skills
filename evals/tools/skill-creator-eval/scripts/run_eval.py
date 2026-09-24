@@ -11,7 +11,8 @@ import argparse
 import json
 import os
 import queue
-import select
+import shutil
+import tempfile
 import threading
 import subprocess
 import sys
@@ -69,7 +70,10 @@ def run_single_query(
     """
     unique_id = uuid.uuid4().hex[:8]
     clean_name = f"{skill_name}-skill-{unique_id}"
-    project_commands_dir = Path(project_root) / ".claude" / "commands"
+    # Each run gets its own throwaway project folder, so parallel sessions never
+    # see (and invoke) each other's temporary copy of the skill.
+    run_root = Path(tempfile.mkdtemp(prefix=f"{clean_name}-"))
+    project_commands_dir = run_root / ".claude" / "commands"
     command_file = project_commands_dir / f"{clean_name}.md"
 
     try:
@@ -84,7 +88,7 @@ def run_single_query(
             f"# {skill_name}\n\n"
             f"This skill handles: {skill_description}\n"
         )
-        command_file.write_text(command_content)
+        command_file.write_text(command_content, encoding="utf-8")
 
         cmd = [
             "claude",
@@ -105,7 +109,7 @@ def run_single_query(
             cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.DEVNULL,
-            cwd=project_root,
+            cwd=run_root,
             env=env,
         )
 
@@ -147,8 +151,7 @@ def run_single_query(
 
                     reason = _abort_reason(event)
                     if reason:
-                        print(f"ABORT: {reason}", file=sys.stderr, flush=True)
-                        os._exit(3)
+                        raise RuntimeError(f"unscoreable run: {reason}")
 
                     # Early detection via stream events
                     if event.get("type") == "stream_event":
@@ -197,13 +200,21 @@ def run_single_query(
         finally:
             # Clean up process on any exit path (return, exception, timeout)
             if process.poll() is None:
+                if os.name == "nt":
+                    # kill() only ends claude itself; its hooks keep running and hold
+                    # the run folder open on Windows. Take down the whole tree.
+                    subprocess.run(["taskkill", "/T", "/F", "/PID", str(process.pid)],
+                                   capture_output=True)
                 process.kill()
                 process.wait()
 
         return triggered
     finally:
-        if command_file.exists():
-            command_file.unlink()
+        for _ in range(10):  # Windows may hold the folder briefly after the kill
+            shutil.rmtree(run_root, ignore_errors=True)
+            if not run_root.exists():
+                break
+            time.sleep(0.5)
 
 
 def run_eval(
@@ -246,8 +257,11 @@ def run_eval(
             try:
                 query_triggers[query].append(future.result())
             except Exception as e:
-                print(f"Warning: query failed: {e}", file=sys.stderr)
-                query_triggers[query].append(False)
+                # A failed run can't be scored. Counting it as "not triggered" would
+                # silently pass every negative, so stop the whole eval instead.
+                print(f"ABORT: run failed for {query[:60]!r}: {e}", file=sys.stderr, flush=True)
+                executor.shutdown(wait=False, cancel_futures=True)
+                sys.exit(3)
 
     for query, triggers in query_triggers.items():
         item = query_items[query]
